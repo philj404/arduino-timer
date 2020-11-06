@@ -239,6 +239,30 @@ test(timer_delayToNextEvent) {
   // (ideally 90 runs)
 };
 
+//////////////////////////////////////////////////////////////////////////////
+// rollover handled correctly?
+//
+test(timer_rollover) {
+  prepForTests();
+
+  simTime = (unsigned long) -3000;
+
+  DummyTask countRuns(0);
+  timer.every( 1000, DummyTask::runATask, &countRuns);
+
+  assertEqual(countRuns.numRuns, 0);
+
+  for(int i = 0; i < 6000; i++) {
+    timer.tick();
+    simDelay(1);
+  }
+
+  assertEqual(countRuns.numRuns, 5); // wrap didn't stop task
+
+  timer.tick();
+  assertEqual(countRuns.numRuns, 6); // still every 1000ms
+};
+
 
 ////////////// ... so which sketch is this?
 void showID(void)
